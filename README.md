@@ -1,14 +1,70 @@
-# astrbot-plugin-helloworld
+# 岁月史书
 
-AstrBot 插件模板 / A template plugin for AstrBot plugin feature
+一个 AstrBot 插件：接收多组 QQ 号和消息，生成 QQ 合并转发聊天记录。
 
-> [!NOTE]
-> This repo is just a template of [AstrBot](https://github.com/AstrBotDevs/AstrBot) Plugin.
-> 
-> [AstrBot](https://github.com/AstrBotDevs/AstrBot) is an agentic assistant for both personal and group conversations. It can be deployed across dozens of mainstream instant messaging platforms, including QQ, Telegram, Feishu, DingTalk, Slack, LINE, Discord, Matrix, etc. In addition, it provides a reliable and extensible conversational AI infrastructure for individuals, developers, and teams. Whether you need a personal AI companion, an intelligent customer support agent, an automation assistant, or an enterprise knowledge base, AstrBot enables you to quickly build AI applications directly within your existing messaging workflows.
+> 合并转发消息目前仅支持 OneBot v11（AstrBot 的 `aiocqhttp` 适配器）。
+> 为避免普通成员滥用伪造记录，`/岁月史书` 默认仅 AstrBot 管理员可用。
 
-# Supports
+## 使用
 
-- [AstrBot Repo](https://github.com/AstrBotDevs/AstrBot)
-- [AstrBot Plugin Development Docs (Chinese)](https://docs.astrbot.app/dev/star/plugin-new.html)
-- [AstrBot Plugin Development Docs (English)](https://docs.astrbot.app/en/dev/star/plugin-new.html)
+发送 JSON 数组：
+
+```text
+/岁月史书 [{"qq":"12345678","message":"你好"},{"qq":"87654321","message":"世界","name":"小明"}]
+```
+
+也可以分行输入，使用 `|` 分隔 QQ 号和消息：
+
+```text
+/岁月史书
+12345678|你好
+87654321|世界
+```
+
+不带参数发送 `/岁月史书` 或发送 `/岁月史书 帮助` 可查看帮助。
+
+## JSON 格式
+
+标准格式：
+
+```json
+[
+  {
+    "qq": "12345678",
+    "message": "第一条消息"
+  },
+  {
+    "qq": "87654321",
+    "message": "第二条消息",
+    "name": "可选昵称"
+  }
+]
+```
+
+支持以下字段别名：
+
+- QQ 号：`qq`、`uin`、`user_id`
+- 消息：`message`、`msg`、`content`、`text`
+- 昵称：`name`、`nickname`、`nick`
+
+还支持包装对象、二元数组和 QQ 到消息的简写映射：
+
+```json
+{"messages":[{"qq":"12345678","message":"你好"}]}
+```
+
+```json
+[["12345678","你好"],["87654321","世界","小明"]]
+```
+
+```json
+{"12345678":"你好","87654321":"世界"}
+```
+
+一次最多生成 100 条记录，每条消息最多 5000 个字符。
+
+## 安装
+
+将本仓库放入 AstrBot 的 `data/plugins` 目录，随后在 WebUI 的插件管理中重载插件。
+
+开发方式参见 [AstrBot 插件开发指南](https://docs.astrbot.app/dev/star/plugin-new.html)。
